@@ -219,7 +219,7 @@ def predict():
                 'success': True,
                 'prediction': round(float(prediction), 0),
                 'prediction_text': f"{round(float(prediction), 0):.0f} vehicles",
-                'confidence': 'High (±160 vehicles, ~9% median error)',
+                'confidence': 'High (±160 vehicles, ~8.9% median error)',
                 'model_r2': 0.9842,
                 'importance': importance,
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
