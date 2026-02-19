@@ -59,5 +59,7 @@ python flask_app.py
 - Analyze feature importance and model explanations
 - Gain insights into what drives predictions
 
+<img width="1886" height="846" alt="image" src="https://github.com/user-attachments/assets/99ea381e-0ebc-4cdd-bac0-f54f9fbac97a" />
+
 
 
