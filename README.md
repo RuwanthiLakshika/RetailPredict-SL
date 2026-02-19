@@ -42,6 +42,29 @@ python flask_app.py
 
 4. Open your browser and navigate to `http://localhost:5000`
 
+## Docker Setup
+
+### Build and Run
+
+```bash
+# Build the Docker image
+docker build -t vehiclepredict:latest .
+
+# Run the application
+docker run -p 5000:5000 vehiclepredict:latest
+```
+
+Then open `http://localhost:5000` in your browser.
+
+### Pull from Docker Hub
+
+```bash
+docker pull ruwanthilakshika/vehiclepredict:latest
+docker run -p 5000:5000 ruwanthilakshika/vehiclepredict:latest
+```
+
+View the image on Docker Hub: https://hub.docker.com/r/ruwanthilakshika/vehiclepredict
+
 ## Usage
 
 ### Making Predictions

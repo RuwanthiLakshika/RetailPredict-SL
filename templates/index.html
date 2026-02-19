@@ -27,53 +27,6 @@
 </div>
 
 <div class="container">
-    <!-- Stats Section -->
-    <section class="stats-section">
-        <h2><i class="fas fa-chart-bar"></i> Model Performance</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-bullseye"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>R² Score</h3>
-                    <p class="stat-value">0.9842</p>
-                    <p class="stat-label">Model Accuracy</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-calculator"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>Prediction Error</h3>
-                    <p class="stat-value">±160 vehicles</p>
-                    <p class="stat-label">MAE (~9% median error)</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-car"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>Categories Tracked</h3>
-                    <p class="stat-value">{{ stats.total_products or 9 }}</p>
-                    <p class="stat-label">Vehicle Types</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-database"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>Data Points</h3>
-                    <p class="stat-value">{{ stats.total_records or '648' }}</p>
-                    <p class="stat-label">Historical Records</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Features Section -->
     <section class="features-section">
         <h2><i class="fas fa-sparkles"></i> Key Features</h2>
