@@ -2,7 +2,7 @@
 Preprocessing Script for Automotive Dataset - Sri Lanka
 
 This script handles:
-1. Data Load: Read automotive CSV dataset
+1. Data Load: Extract data from PDF files in raw folder
 2. Data Cleaning: Remove anomalies, handle missing values
 3. Feature Engineering: Create derived metrics for model training
 4. Data Validation: Ensure data quality and consistency
@@ -17,45 +17,110 @@ import os
 import warnings
 from pathlib import Path
 
+try:
+    import pdfplumber
+except ImportError:
+    pdfplumber = None
+
 warnings.filterwarnings('ignore')
 
 
 class AutomotiveDataPreprocessor:
-    """Handle all preprocessing steps for the automotive dataset."""
     
-    def __init__(self, raw_data_path, output_path):
+    def __init__(self, raw_pdf_folder, output_path):
         """
         Initialize the preprocessor.
         
         Args:
-            raw_data_path: Path to raw automotive CSV file
+            raw_pdf_folder: Path to folder containing raw PDF files
             output_path: Path to save the processed master dataset
         """
-        self.raw_data_path = raw_data_path
+        self.raw_pdf_folder = raw_pdf_folder
         self.output_path = output_path
         self.df = None
         self.df_processed = None
     
+    def extract_tables_from_pdf(self, pdf_path):
+        """
+        Extract tables from a PDF file.
+        
+        Args:
+            pdf_path: Path to PDF file
+            
+        Returns:
+            list: List of DataFrames extracted from PDF tables
+        """
+        if pdfplumber is None:
+            raise ImportError("pdfplumber is required. Install it with: pip install pdfplumber")
+        
+        tables = []
+        try:
+            with pdfplumber.open(pdf_path) as pdf:
+                for page in pdf.pages:
+                    extracted_tables = page.extract_tables()
+                    if extracted_tables:
+                        for table in extracted_tables:
+                            if table:  # Only if table has data
+                                df = pd.DataFrame(table[1:], columns=table[0])  # First row as header
+                                if not df.empty:
+                                    tables.append(df)
+        except Exception as e:
+            print(f"  Warning: Could not extract from {os.path.basename(pdf_path)}: {str(e)}")
+        
+        return tables
+    
     def load_data(self):
         """
         Step 1: Data Loading
-        Load the automotive dataset from CSV.
+        Load automotive dataset from PDF files in raw folder.
         
         Returns:
-            pd.DataFrame: Loaded raw dataset
+            pd.DataFrame: Loaded raw dataset combined from all PDFs
         """
-        print("Step 1: Data Loading...")
+        print("Step 1: Data Loading from PDFs...")
         
-        if not os.path.exists(self.raw_data_path):
-            raise FileNotFoundError(f"Dataset not found at {self.raw_data_path}")
+        if not os.path.exists(self.raw_pdf_folder):
+            raise FileNotFoundError(f"Raw PDF folder not found at {self.raw_pdf_folder}")
         
-        self.df = pd.read_csv(self.raw_data_path)
+        # Get all PDF files
+        pdf_files = [f for f in os.listdir(self.raw_pdf_folder) 
+                     if f.lower().endswith('.pdf')]
+        
+        if not pdf_files:
+            raise FileNotFoundError(f"No PDF files found in {self.raw_pdf_folder}")
+        
+        print(f"  Found {len(pdf_files)} PDF files:")
+        for f in sorted(pdf_files):
+            print(f"    - {f}")
+        
+        # Extract tables from all PDFs
+        all_data = []
+        for pdf_file in sorted(pdf_files):
+            pdf_path = os.path.join(self.raw_pdf_folder, pdf_file)
+            print(f"\n  Extracting from: {pdf_file}")
+            tables = self.extract_tables_from_pdf(pdf_path)
+            
+            for table_df in tables:
+                if not table_df.empty:
+                    # Clean column names
+                    table_df.columns = [col.strip().lower().replace(' ', '_') for col in table_df.columns]
+                    # Remove completely empty rows
+                    table_df = table_df.dropna(how='all')
+                    if not table_df.empty:
+                        all_data.append(table_df)
+            
+            print(f"    Extracted {len(tables)} table(s)")
+        
+        if not all_data:
+            raise ValueError("No data extracted from PDF files")
+        
+        # Combine all tables with axis 0, allowing different columns
+        print(f"\n  Combining {len(all_data)} extracted tables...")
+        self.df = pd.concat(all_data, ignore_index=True, sort=False)
+        
         print(f"✓ Dataset loaded: {self.df.shape}")
-        print(f"  Columns: {list(self.df.columns)}")
-        print(f"\n  Data Overview:")
-        print(f"    Year range: {self.df['Year'].min()} - {self.df['Year'].max()}")
-        print(f"    Categories: {self.df['Standard_Category'].unique().tolist()}")
-        print(f"    Total records: {len(self.df)}")
+        print(f"  Columns found: {list(self.df.columns)}")
+        print(f"  Total records: {len(self.df)}")
         
         return self.df
     
@@ -276,11 +341,11 @@ def main():
     """Main function to run the preprocessing pipeline."""
     
     # Define paths
-    raw_data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'SriLanka_Automotive_Advanced_Features.csv')
+    raw_pdf_folder = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw')
     output_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'master_dataset.csv')
     
     # Create preprocessor and run pipeline
-    preprocessor = AutomotiveDataPreprocessor(raw_data_path, output_path)
+    preprocessor = AutomotiveDataPreprocessor(raw_pdf_folder, output_path)
     df_processed = preprocessor.preprocess_pipeline()
     
     return df_processed

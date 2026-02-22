@@ -357,8 +357,6 @@ class RetailPriceModelTrainer:
             self.split_data(X, y)
             
             # Train model with BAYESIAN OPTIMIZED HYPERPARAMETERS + LOG-TRANSFORM
-            # Results: R² = 0.9842 | MAE = 160.10 vehicles/month | MedAPE = 8.9%
-            # Previous: R² = 0.9760 | MAE = 306.68 (47.8% MAE reduction)
             self.train_model(learning_rate=0.030562, iterations=1876, depth=4, 
                            l2_leaf_reg=0.988819, subsample=0.733632,
                            colsample_bylevel=0.666635, random_strength=5.755841,

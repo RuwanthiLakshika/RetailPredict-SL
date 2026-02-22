@@ -4,7 +4,7 @@ SHAP Explainability Analysis - Vehicle Registration Prediction
 This script explains HOW the model makes predictions using SHAP values.
 Focus: Show which features have the most impact on vehicle registration predictions.
 
-Uses CatBoost model optimized via Bayesian Optimization (R² = 0.9760, MAE = 306.68)
+Uses CatBoost model optimized via Bayesian Optimization 
 """
 
 import pandas as pd
